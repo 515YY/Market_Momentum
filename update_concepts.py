@@ -78,9 +78,12 @@ def scrape_all():
     
     print(f"Finished. Total unique stocks found: {len(final_map)}")
     
-    with open('c:/coding/code/Market_Momentum/concept_map.json', 'w', encoding='utf-8') as f:
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    output_path = os.path.join(base_dir, 'concept_map.json')
+    
+    with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(final_map, f, ensure_ascii=False, indent=2)
-        print("Saved to concept_map.json")
+        print(f"Saved to {output_path}")
 
 if __name__ == "__main__":
     scrape_all()

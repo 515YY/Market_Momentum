@@ -18,7 +18,7 @@ def clean_code(x):
 def run_update():
     
     concept_map = {}
-    csv_path = 'c:/coding/code/Market_Momentum/concept_map.json'
+    csv_path = os.path.join(BASE_DIR, 'concept_map.json')
     if os.path.exists(csv_path):
         try:
             with open(csv_path, 'r', encoding='utf-8') as f:
