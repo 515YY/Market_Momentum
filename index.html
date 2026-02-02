@@ -232,7 +232,6 @@
         function initDashboard(data) {
             document.getElementById('update-time').textContent = "Last Updated: " + (data.last_updated || 'Today');
 
-            // Generate global color map based on rank
             const sortedThemes = [...data.themes].sort((a, b) => b.avg_change - a.avg_change);
             globalThemeColors = {};
             sortedThemes.forEach((t, index) => {
@@ -445,8 +444,7 @@
                         type: 'inside',
                         xAxisIndex: 0,
                         startValue: 0,
-                        endValue: endValue,
-                        zoomLock: true
+                        endValue: endValue
                     },
                     {
                         show: false,
@@ -619,11 +617,9 @@
         }
 
         function getColorForTag(tag) {
-            // Use rank-based color if available
             if (globalThemeColors[tag]) {
                 return globalThemeColors[tag];
             }
-            // Fallback to hash-based color
             let hash = 0;
             for (let i = 0; i < tag.length; i++) {
                 hash = tag.charCodeAt(i) + ((hash << 5) - hash);
