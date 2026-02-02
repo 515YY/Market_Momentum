@@ -544,9 +544,10 @@
                 const themes = s.themes || [];
                 let displayThemes = themes.length > 0 ? themes : (s.Sector ? [s.Sector] : []);
 
-                const themeTags = displayThemes.slice(0, 3).map(t =>
-                    `<span class="px-1.5 py-0.5 rounded-sm bg-slate-800 text-[10px] text-slate-400 border border-slate-700">${t}</span>`
-                ).join('');
+                const themeTags = displayThemes.slice(0, 3).map(t => {
+                    const color = getColorForTag(t);
+                    return `<span class="px-1.5 py-0.5 rounded-sm text-[10px] border" style="background-color: ${color}15; color: ${color}; border-color: ${color}40">${t}</span>`;
+                }).join('');
 
                 let businessInfo = s.supply_chain || '';
                 if (!businessInfo && s.Sector) businessInfo = s.Sector;
@@ -569,14 +570,14 @@
                     </td>
                     <td class="p-3 align-middle text-center w-64">
                         <div class="flex flex-wrap gap-1 justify-center max-w-[240px] mx-auto">
-                            ${(s.concepts || []).map(c =>
-                    `<span class="px-1.5 py-0.5 rounded-sm bg-indigo-900/50 text-[10px] text-indigo-200 border border-indigo-700/50" title="${c}">${c}</span>`
-                ).join('')}
+                            ${(s.concepts || []).map(c => {
+                    const color = getColorForTag(c);
+                    return `<span class="px-1.5 py-0.5 rounded-sm text-[10px] border" title="${c}" style="background-color: ${color}15; color: ${color}; border-color: ${color}40">${c}</span>`;
+                }).join('')}
                         </div>
                     </td>
                     <td class="p-3 text-center font-mono text-slate-300 align-middle w-32">${s.Price}</td>
                     <td class="p-3 text-center font-mono text-slate-400 align-middle w-32">${mktCapVal}</td> 
-
                     <td class="p-3 text-center font-mono font-bold ${changeColor} align-middle w-32">${s['Change(%)'] > 0 ? '+' : ''}${s['Change(%)'].toFixed(2)}%</td>
                     <td class="p-3 text-center font-mono text-slate-400 align-middle w-32">${s.Amplitude ? s.Amplitude.toFixed(2) + '%' : '-'}</td>
                     <td class="p-3 text-center font-mono text-slate-300 align-middle w-32">${s['Turnover(M)']}</td>
@@ -588,6 +589,15 @@
 
             tbody.appendChild(fragment);
             renderOffset += chunk.length;
+        }
+
+        function getColorForTag(tag) {
+            let hash = 0;
+            for (let i = 0; i < tag.length; i++) {
+                hash = tag.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            const index = Math.abs(hash) % CHART_PALETTE.length;
+            return CHART_PALETTE[index];
         }
 
         document.querySelector('.flex-1.overflow-auto').addEventListener('scroll', function (e) {
