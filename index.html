@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Intelligence Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1rem;
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, #38bdf8, #818cf8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+    </style>
+</head>
+
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <main class="h-screen w-screen flex flex-col overflow-hidden p-6 relative">
+
+        <div class="h-[35%] flex gap-6 mb-6">
+
+            <div class="flex-1 grid grid-cols-3 gap-6">
+                <!-- Bar Chart (Takes 2 columns) -->
+                <div
+                    class="col-span-2 bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-2xl relative overflow-hidden group">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    </div>
+                    <h2 class="text-xl font-bold text-white mb-2 flex items-center">
+                        <span
+                            class="w-2 h-6 bg-gradient-to-b from-cyan-400 to-blue-500 rounded-full mr-3 shadow-[0_0_15px_rgba(56,189,248,0.5)]"></span>
+                        熱點資金動能
+                    </h2>
+                    <div id="radar-chart" class="w-full h-[calc(100%-2rem)]"></div>
+                </div>
+
+                <!-- Pie Chart (Takes 1 column) -->
+                <div
+                    class="col-span-1 bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-2xl relative overflow-hidden group">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity">
+                    </div>
+                    <h2 class="text-xl font-bold text-white mb-2 flex items-center">
+                        <span
+                            class="w-2 h-6 bg-gradient-to-b from-emerald-400 to-teal-500 rounded-full mr-3 shadow-[0_0_15px_rgba(52,211,153,0.5)]"></span>
+                        資金分佈
+                    </h2>
+                    <div id="pie-chart" class="w-full h-[calc(100%-2rem)]"></div>
+                </div>
+            </div>
+
+            <div
+                class="w-80 bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-2xl flex flex-col">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-lg font-bold text-white flex items-center">
+                        <span
+                            class="w-2 h-6 bg-gradient-to-b from-rose-400 to-red-500 rounded-full mr-3 shadow-[0_0_15px_rgba(244,63,94,0.5)]"></span>
+                        熱點排行榜
+                    </h2>
+                    <span class="text-xs text-slate-500">By Avg Change</span>
+                </div>
+                <div id="top-themes-list" class="flex-1 overflow-y-auto pr-1 space-y-1 custom-scrollbar">
+                </div>
+            </div>
+
+        </div>
+
+        <div
+            class="flex-1 bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-2xl p-1 shadow-2xl flex flex-col overflow-hidden">
+            <div class="p-4 border-b border-white/5 flex items-center justify-between shrink-0">
+                <div class="flex items-center gap-4">
+                    <h2 class="text-xl font-bold text-white flex items-center cursor-pointer hover:opacity-80 transition-opacity"
+                        id="table-title" onclick="resetFilter()" title="Click to Reset">
+                        <span class="text-gradient">全市場觀察</span>
+                    </h2>
+                    <span id="stock-count"
+                        class="px-2 py-1 rounded bg-slate-800 border border-slate-700 text-xs text-slate-400">0
+                        stocks</span>
+                    <button id="reset-btn"
+                        class="hidden px-2 py-1 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded transition-colors"
+                        onclick="resetFilter()">
+                        Reset Filter ✕
+                    </button>
+                </div>
+                <span class="text-xs text-slate-600 font-mono" id="update-time">Using Latest Data</span>
+            </div>
+
+            <div class="flex-1 overflow-hidden relative">
+                <div class="absolute inset-0 overflow-auto custom-scrollbar">
+                    <table class="w-full">
+                        <thead class="bg-slate-950/80 sticky top-0 backdrop-blur-md z-10">
+                            <tr>
+                                <th
+                                    class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center w-20">
+                                    代號</th>
+                                <th
+                                    class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center w-48">
+                                    名稱 / 業務</th>
+                                <th
+                                    class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center w-32">
+                                    產業細項</th>
+                                <th
+                                    class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center w-32">
+                                    概念 / 題材</th>
+                                <th class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center cursor-pointer hover:text-white select-none group"
+                                    onclick="sortTable('price')">
+                                    成交價 <span id="sort-icon-price" class="text-[10px] ml-1 opacity-50">⇅</span>
+                                </th>
+                                <th class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center cursor-pointer hover:text-white select-none group"
+                                    onclick="sortTable('mkt_cap')">
+                                    市值(億) <span id="sort-icon-mkt_cap" class="text-[10px] ml-1 opacity-50">⇅</span>
+                                </th>
+                                <th class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center cursor-pointer hover:text-white select-none group"
+                                    onclick="sortTable('change')">
+                                    漲跌幅(%) <span id="sort-icon-change" class="text-[10px] ml-1 opacity-50">⇅</span>
+                                </th>
+                                <th class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center cursor-pointer hover:text-white select-none group"
+                                    onclick="sortTable('amp')">
+                                    振幅(%) <span id="sort-icon-amp" class="text-[10px] ml-1 opacity-50">⇅</span>
+                                </th>
+                                <th class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center cursor-pointer hover:text-white select-none group"
+                                    onclick="sortTable('turnover')">
+                                    成交額(百萬) <span id="sort-icon-turnover" class="text-[10px] ml-1 opacity-50">⇅</span>
+                                </th>
+                                <th class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center cursor-pointer hover:text-white select-none group"
+                                    onclick="sortTable('vol')">
+                                    成交數(張) <span id="sort-icon-vol" class="text-[10px] ml-1 opacity-50">⇅</span>
+                                </th>
+                                <th class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center cursor-pointer hover:text-white select-none group"
+                                    onclick="sortTable('rate')">
+                                    成交周轉率(%) <span id="sort-icon-rate" class="text-[10px] ml-1 opacity-50">⇅</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="stock-tbody" class="divide-y divide-gray-800 text-sm">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="dashboard_data.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!window.DASHBOARD_DATA) {
+                alert("Data not found. Please run run_daily_update.bat");
+                return;
+            }
+            initDashboard(window.DASHBOARD_DATA);
+        });
+
+        let chartInstance = null;
+        let currentFilter = null;
+        let currentSort = { col: 'change', dir: 'desc' };
+
+        const CHART_PALETTE = [
+            '#F94144', '#F3722C', '#F8961E', '#F9844A', '#F9C74F',
+            '#90BE6D', '#43AA8B', '#4D908E', '#577590', '#277DA1',
+            '#6A4C93', '#8338EC', '#3A86FF', '#FF006E', '#FB5607'
+        ];
+
+        function initDashboard(data) {
+            document.getElementById('update-time').textContent = "Last Updated: " + (data.last_updated || 'Today');
+            initBarChart(data.themes);
+            initPieChart(data.themes);
+            renderTopThemes(data.themes);
+            applySort();
+        }
+
+        function initPieChart(themes) {
+            const dom = document.getElementById('pie-chart');
+            const chart = echarts.init(dom);
+
+            // Use same top 15 themes
+            const topThemes = [...themes].sort((a, b) => b.avg_change - a.avg_change).slice(0, 15);
+
+            const data = topThemes.map((t, index) => ({
+                value: t.market_cap_flow,
+                name: t.name,
+                itemStyle: {
+                    color: CHART_PALETTE[index % CHART_PALETTE.length]
+                }
+            }));
+
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'item',
+                    formatter: function (params) {
+                        return `
+                            <div class="font-bold text-base mb-1" style="color: ${params.color}">${params.name}</div>
+                            <div class="text-xs text-slate-300">
+                                成交額: ${params.value}M<br/>
+                                占比: ${params.percent}%
+                            </div>
+                        `;
+                    },
+                    backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                    borderColor: '#475569',
+                    textStyle: { color: '#f8fafc' }
+                },
+                legend: {
+                    show: false
+                },
+                series: [
+                    {
+                        name: 'Access From',
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: {
+                            borderRadius: 10,
+                            borderColor: '#0f172a',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: false,
+                            position: 'center'
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: 14,
+                                fontWeight: 'bold',
+                                color: '#fff'
+                            },
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        },
+                        labelLine: {
+                            show: false
+                        },
+                        data: data
+                    }
+                ]
+            };
+
+            chart.setOption(option);
+            window.addEventListener('resize', () => chart.resize());
+
+            chart.on('click', function (params) {
+                if (params.name) filterTableByTheme(params.name);
+            });
+        }
+
+        function resetFilter() {
+            currentFilter = null;
+            document.getElementById('table-title').innerHTML = `<span class="text-gradient">全市場觀察</span>`;
+            document.getElementById('reset-btn').classList.add('hidden');
+            applySort();
+        }
+
+        function toggleSortIcon(col, dir) {
+            const ids = ['price', 'mkt_cap', 'change', 'amp', 'turnover', 'vol', 'rate'];
+            ids.forEach(id => {
+                const el = document.getElementById(`sort-icon-${id}`);
+                if (el) { el.textContent = '⇅'; el.className = 'text-[10px] ml-1 opacity-50'; }
+            });
+
+            const icon = document.getElementById(`sort-icon-${col}`);
+            if (icon) {
+                icon.textContent = dir === 'asc' ? '↑' : '↓';
+                icon.className = 'text-[10px] ml-1 opacity-100 text-blue-400 font-bold';
+            }
+        }
+
+        function sortTable(col) {
+            if (currentSort.col === col) {
+                currentSort.dir = currentSort.dir === 'desc' ? 'asc' : 'desc';
+            } else {
+                currentSort.col = col;
+                currentSort.dir = 'desc';
+            }
+            applySort();
+        }
+
+        function applySort() {
+            toggleSortIcon(currentSort.col, currentSort.dir);
+
+            let source = window.DASHBOARD_DATA.stocks;
+            if (currentFilter) {
+                source = source.filter(s =>
+                    (s.themes && s.themes.includes(currentFilter)) ||
+                    (s.concepts && s.concepts.includes(currentFilter))
+                );
+                document.getElementById('reset-btn').classList.remove('hidden');
+            } else {
+                source = [...window.DASHBOARD_DATA.stocks];
+                document.getElementById('reset-btn').classList.add('hidden');
+            }
+
+            source.sort((a, b) => {
+                let fieldA, fieldB;
+
+                const map = {
+                    'price': 'Price',
+                    'mkt_cap': 'Market_Cap',
+                    'change': 'Change(%)',
+                    'amp': 'Amplitude',
+                    'turnover': 'Turnover(M)',
+                    'vol': 'Volume',
+                    'rate': 'Turnover_Rate(%)'
+                };
+
+                const key = map[currentSort.col];
+                let valA = a[key] || 0;
+                let valB = b[key] || 0;
+
+                return currentSort.dir === 'asc' ? valA - valB : valB - valA;
+            });
+
+            renderStockTable(source);
+        }
+
+        function initBarChart(themes) {
+            const dom = document.getElementById('radar-chart');
+            chartInstance = echarts.init(dom);
+
+            const verticalSorted = [...themes].sort((a, b) => b.avg_change - a.avg_change).slice(0, 15);
+
+            const categories = verticalSorted.map(t => t.name);
+            const values = verticalSorted.map(t => t.avg_change);
+
+            const option = {
+                backgroundColor: 'transparent',
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' },
+                    formatter: function (params) {
+                        const t = verticalSorted[params[0].dataIndex];
+                        return `
+                            <div class="font-bold text-base mb-1">${t.name}</div>
+                            <div class="text-xs text-slate-300">
+                                平均漲幅: ${t.avg_change.toFixed(2)}%<br/>
+                                上漲比例: ${(t.up_ratio * 100).toFixed(0)}%<br/>
+                                總成交額: ${t.market_cap_flow}M<br/>
+                                家數: ${t.count}
+                            </div>
+                        `;
+                    },
+                    backgroundColor: 'rgba(30, 41, 59, 0.9)',
+                    borderColor: '#475569',
+                    textStyle: { color: '#f8fafc' }
+                },
+                grid: { top: 30, right: 10, bottom: 20, left: 10, containLabel: true },
+                xAxis: {
+                    type: 'category',
+                    data: categories,
+                    axisLabel: { color: '#cbd5e1', fontWeight: 'bold', interval: 0, rotate: 30, triggerEvent: true },
+                    axisLine: { show: false },
+                    axisTick: { show: false },
+                    splitLine: { show: false }
+                },
+                yAxis: {
+                    type: 'value',
+                    splitLine: { show: true, lineStyle: { color: 'rgba(255,255,255,0.05)' } },
+                    axisLabel: { color: '#94a3b8', formatter: '{value}%' }
+                },
+                dataZoom: [{ type: 'inside', start: 0, end: 100 }],
+                series: [{
+                    type: 'bar',
+                    data: values,
+                    barWidth: '60%',
+                    itemStyle: {
+                        color: function (params) {
+                            return CHART_PALETTE[params.dataIndex % CHART_PALETTE.length];
+                        },
+                        borderRadius: [4, 4, 0, 0]
+                    },
+                    label: {
+                        show: true,
+                        position: 'top',
+                        formatter: '{c}%',
+                        color: '#fff',
+                        fontSize: 10
+                    }
+                }]
+            };
+
+            chartInstance.setOption(option);
+            window.addEventListener('resize', () => chartInstance.resize());
+
+            // Handle standard component clicks (bars, labels if triggerEvent is true)
+            // Handle standard component clicks (bars, labels if triggerEvent is true)
+            chartInstance.on('click', function (params) {
+                if (params.componentType === 'xAxis') {
+                    if (params.value) filterTableByTheme(params.value);
+                } else if (params.componentType === 'series') {
+                    if (params.name) filterTableByTheme(params.name);
+                }
+            });
+
+            // Handle clicks on the background (shadow area)
+            chartInstance.getZr().on('click', function (params) {
+                const pointInPixel = [params.offsetX, params.offsetY];
+                if (chartInstance.containPixel('grid', pointInPixel)) {
+                    // Using '0' for the first logic axis index (xAxis)
+                    const pointInGrid = chartInstance.convertFromPixel({ seriesIndex: 0 }, pointInPixel);
+                    const xIndex = pointInGrid[0];
+                    if (xIndex >= 0 && xIndex < categories.length) {
+                        const themeName = categories[xIndex];
+                        filterTableByTheme(themeName);
+                    }
+                }
+            });
+        }
+
+        function renderTopThemes(themes) {
+            const container = document.getElementById('top-themes-list');
+            container.innerHTML = '';
+
+            const top = [...themes].sort((a, b) => b.avg_change - a.avg_change);
+
+            top.forEach((t, index) => {
+                const el = document.createElement('div');
+                el.className = "flex items-center justify-between p-2 hover:bg-white/5 rounded cursor-pointer transition-colors group";
+                el.onclick = () => filterTableByTheme(t.name);
+
+                // Use the palette color for the number badge
+                const badgeColor = CHART_PALETTE[index % CHART_PALETTE.length];
+                const changeColor = t.avg_change > 0 ? 'text-rose-400' : 'text-emerald-400';
+
+                el.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-bold w-4 text-center rounded" style="color: ${badgeColor}">${index + 1}</span>
+                        <span class="font-medium text-sm text-slate-200 group-hover:text-white truncate max-w-[120px]">${t.name}</span>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs font-bold ${changeColor}">${t.avg_change > 0 ? '+' : ''}${t.avg_change.toFixed(2)}%</div>
+                        <div class="text-[10px] text-slate-500">${Math.round(t.market_cap_flow)}M</div>
+                    </div>
+                `;
+                container.appendChild(el);
+            });
+        }
+
+        function filterTableByTheme(themeName) {
+            currentFilter = themeName;
+            document.getElementById('table-title').innerHTML = `族群: <span class="text-gradient">${themeName}</span>`;
+            applySort();
+        }
+
+        let currentStocks = [];
+        let renderOffset = 0;
+        const CHUNK_SIZE = 3000;
+
+        function renderStockTable(stocks) {
+            const tbody = document.getElementById('stock-tbody');
+            const countBadge = document.getElementById('stock-count');
+
+            currentStocks = stocks;
+            renderOffset = 0;
+            tbody.innerHTML = '';
+            tbody.parentElement.scrollTop = 0;
+
+            countBadge.textContent = `${stocks.length} stocks`;
+
+            renderChunk();
+        }
+
+        function renderChunk() {
+            const tbody = document.getElementById('stock-tbody');
+            const chunk = currentStocks.slice(renderOffset, renderOffset + CHUNK_SIZE);
+
+            if (chunk.length === 0) return;
+
+            const fragment = document.createDocumentFragment();
+
+            chunk.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/50 transition-colors border-b border-white/5";
+
+                const changeColor = s['Change(%)'] > 0 ? 'text-rose-400' : (s['Change(%)'] < 0 ? 'text-emerald-400' : 'text-slate-400');
+
+                const themes = s.themes || [];
+                let displayThemes = themes.length > 0 ? themes : (s.Sector ? [s.Sector] : []);
+
+                const themeTags = displayThemes.slice(0, 3).map(t =>
+                    `<span class="px-1.5 py-0.5 rounded-sm bg-slate-800 text-[10px] text-slate-400 border border-slate-700">${t}</span>`
+                ).join('');
+
+                let businessInfo = s.supply_chain || '';
+                if (!businessInfo && s.Sector) businessInfo = s.Sector;
+                if (businessInfo) {
+                    businessInfo = `<div class="text-[10px] text-slate-500 mt-0.5 truncate max-w-[180px] mx-auto">${businessInfo}</div>`;
+                }
+
+                const mktCapVal = s.Market_Cap ? Number(s.Market_Cap).toFixed(0) : '-';
+
+                const volStr = s.Volume ? s.Volume : '-';
+
+                tr.innerHTML = `
+                    <td class="p-3 text-slate-300 font-mono align-middle text-center w-20">${s.Code}</td>
+                    <td class="p-3 align-middle text-center w-48">
+                        <div class="font-medium text-white text-sm">${s.Name}</div>
+                        ${businessInfo}
+                    </td>
+                    <td class="p-3 align-middle text-center w-32">
+                        <div class="flex flex-wrap gap-1 justify-center max-w-[200px] mx-auto">${themeTags}</div>
+                    </td>
+                    <td class="p-3 align-middle text-center w-32">
+                        <div class="flex flex-wrap gap-1 justify-center max-w-[200px] mx-auto">
+                            ${(s.concepts || []).map(c =>
+                    `<span class="px-1.5 py-0.5 rounded-sm bg-indigo-900/50 text-[10px] text-indigo-200 border border-indigo-700/50" title="${c}">${c}</span>`
+                ).join('')}
+                        </div>
+                    </td>
+                    <td class="p-3 text-center font-mono text-slate-300 align-middle">${s.Price}</td>
+                    <td class="p-3 text-center font-mono text-slate-400 align-middle">${mktCapVal}</td> 
+
+                    <td class="p-3 text-center font-mono font-bold ${changeColor} align-middle">${s['Change(%)'] > 0 ? '+' : ''}${s['Change(%)'].toFixed(2)}%</td>
+                    <td class="p-3 text-center font-mono text-slate-400 align-middle">${s.Amplitude ? s.Amplitude.toFixed(2) + '%' : '-'}</td>
+                    <td class="p-3 text-center font-mono text-slate-300 align-middle">${s['Turnover(M)']}</td>
+                    <td class="p-3 text-center font-mono text-slate-400 align-middle">${volStr}</td>
+                    <td class="p-3 text-center font-mono text-slate-400 align-middle">${s['Turnover_Rate(%)'] ? s['Turnover_Rate(%)'].toFixed(2) + '%' : '-'}</td>
+                `;
+                fragment.appendChild(tr);
+            });
+
+            tbody.appendChild(fragment);
+            renderOffset += chunk.length;
+        }
+
+        document.querySelector('.flex-1.overflow-auto').addEventListener('scroll', function (e) {
+            const { scrollTop, scrollHeight, clientHeight } = e.target;
+            if (scrollTop + clientHeight >= scrollHeight - 100) {
+                renderChunk();
+            }
+        });
+    </script>
+</body>
+
+</html>
