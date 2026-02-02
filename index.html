@@ -528,15 +528,15 @@
                         <div class="text-[10px] text-slate-500">${Math.round(t.market_cap_flow)}M</div>
                     </div>
                 `;
-                container.appendChild(el);
-            });
-        }
+            }
 
         // Custom Tooltip Logic
-        const tooltipEl = document.getElementById('custom-tooltip');
-
+        
         function showTooltip(t) {
-            tooltipEl.innerHTML = `
+                    const tooltipEl = document.getElementById('custom-tooltip');
+                    if (!tooltipEl) return;
+
+                    tooltipEl.innerHTML = `
                 <div class="font-bold text-base mb-1">${t.name}</div>
                 <div class="text-xs text-gray-400">
                     平均漲幅: <span class="${t.avg_change > 0 ? 'text-rose-400' : 'text-emerald-400'}">${t.avg_change.toFixed(2)}%</span><br/>
@@ -545,81 +545,83 @@
                     總成交額: ${t.market_cap_flow}M
                 </div>
             `;
-            tooltipEl.classList.remove('hidden');
-        }
-
-        function moveTooltip(e) {
-            // Keep tooltip near cursor but ensure it doesn't go off screen
-            const x = e.clientX + 15;
-            const y = e.clientY + 15;
-
-            // Basic boundary check (optional, but good for UX)
-            // For now, just follow cursor
-            tooltipEl.style.left = x + 'px';
-            tooltipEl.style.top = y + 'px';
-        }
-
-        function hideTooltip() {
-            tooltipEl.classList.add('hidden');
-        }
-
-        function filterTableByTheme(themeName) {
-            currentFilter = themeName;
-            document.getElementById('table-title').innerHTML = `族群: <span class="text-gradient">${themeName}</span>`;
-            applySort();
-        }
-
-        let currentStocks = [];
-        let renderOffset = 0;
-        const CHUNK_SIZE = 3000;
-
-        function renderStockTable(stocks) {
-            const tbody = document.getElementById('stock-tbody');
-            const countBadge = document.getElementById('stock-count');
-
-            currentStocks = stocks;
-            renderOffset = 0;
-            tbody.innerHTML = '';
-            tbody.parentElement.scrollTop = 0;
-
-            countBadge.textContent = `${stocks.length} stocks`;
-
-            renderChunk();
-        }
-
-        function renderChunk() {
-            const tbody = document.getElementById('stock-tbody');
-            const chunk = currentStocks.slice(renderOffset, renderOffset + CHUNK_SIZE);
-
-            if (chunk.length === 0) return;
-
-            const fragment = document.createDocumentFragment();
-
-            chunk.forEach(s => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-800/50 transition-colors border-b border-white/5";
-
-                const changeColor = s['Change(%)'] > 0 ? 'text-rose-400' : (s['Change(%)'] < 0 ? 'text-emerald-400' : 'text-slate-400');
-
-                const themes = s.themes || [];
-                let displayThemes = themes.length > 0 ? themes : (s.Sector ? [s.Sector] : []);
-
-                const themeTags = displayThemes.slice(0, 3).map(t => {
-                    const color = getColorForTag(t);
-                    return `<span class="px-1.5 py-0.5 rounded-sm text-[10px] border" style="background-color: ${color}15; color: ${color}; border-color: ${color}40">${t}</span>`;
-                }).join('');
-
-                let businessInfo = s.supply_chain || '';
-                if (!businessInfo && s.Sector) businessInfo = s.Sector;
-                if (businessInfo) {
-                    businessInfo = `<div class="text-[10px] text-slate-500 mt-0.5 truncate max-w-[180px] mx-auto">${businessInfo}</div>`;
+                    tooltipEl.classList.remove('hidden');
                 }
 
-                const mktCapVal = s.Market_Cap ? Number(s.Market_Cap).toFixed(0) : '-';
+        function moveTooltip(e) {
+                    const tooltipEl = document.getElementById('custom-tooltip');
+                    if (!tooltipEl) return;
 
-                const volStr = s.Volume ? s.Volume : '-';
+                    // Keep tooltip near cursor but ensure it doesn't go off screen
+                    const x = e.clientX + 15;
+                    const y = e.clientY + 15;
 
-                tr.innerHTML = `
+                    tooltipEl.style.left = x + 'px';
+                    tooltipEl.style.top = y + 'px';
+                }
+
+        function hideTooltip() {
+                    const tooltipEl = document.getElementById('custom-tooltip');
+                    if (tooltipEl) tooltipEl.classList.add('hidden');
+                }
+
+        function filterTableByTheme(themeName) {
+                    currentFilter = themeName;
+                    document.getElementById('table-title').innerHTML = `族群: <span class="text-gradient">${themeName}</span>`;
+                    applySort();
+                }
+
+        let currentStocks = [];
+            let renderOffset = 0;
+            const CHUNK_SIZE = 3000;
+
+            function renderStockTable(stocks) {
+                const tbody = document.getElementById('stock-tbody');
+                const countBadge = document.getElementById('stock-count');
+
+                currentStocks = stocks;
+                renderOffset = 0;
+                tbody.innerHTML = '';
+                tbody.parentElement.scrollTop = 0;
+
+                countBadge.textContent = `${stocks.length} stocks`;
+
+                renderChunk();
+            }
+
+            function renderChunk() {
+                const tbody = document.getElementById('stock-tbody');
+                const chunk = currentStocks.slice(renderOffset, renderOffset + CHUNK_SIZE);
+
+                if (chunk.length === 0) return;
+
+                const fragment = document.createDocumentFragment();
+
+                chunk.forEach(s => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-800/50 transition-colors border-b border-white/5";
+
+                    const changeColor = s['Change(%)'] > 0 ? 'text-rose-400' : (s['Change(%)'] < 0 ? 'text-emerald-400' : 'text-slate-400');
+
+                    const themes = s.themes || [];
+                    let displayThemes = themes.length > 0 ? themes : (s.Sector ? [s.Sector] : []);
+
+                    const themeTags = displayThemes.slice(0, 3).map(t => {
+                        const color = getColorForTag(t);
+                        return `<span class="px-1.5 py-0.5 rounded-sm text-[10px] border" style="background-color: ${color}15; color: ${color}; border-color: ${color}40">${t}</span>`;
+                    }).join('');
+
+                    let businessInfo = s.supply_chain || '';
+                    if (!businessInfo && s.Sector) businessInfo = s.Sector;
+                    if (businessInfo) {
+                        businessInfo = `<div class="text-[10px] text-slate-500 mt-0.5 truncate max-w-[180px] mx-auto">${businessInfo}</div>`;
+                    }
+
+                    const mktCapVal = s.Market_Cap ? Number(s.Market_Cap).toFixed(0) : '-';
+
+                    const volStr = s.Volume ? s.Volume : '-';
+
+                    tr.innerHTML = `
                     <td class="p-3 text-slate-300 font-mono align-middle text-center w-32">${s.Code}</td>
                     <td class="p-3 align-middle text-center w-32">
                         <div class="font-medium text-white text-sm">${s.Name}</div>
@@ -631,9 +633,9 @@
                     <td class="p-3 align-middle text-center w-64">
                         <div class="flex flex-wrap gap-1 justify-center max-w-[240px] mx-auto">
                             ${(s.concepts || []).map(c => {
-                    const color = getColorForTag(c);
-                    return `<span class="px-1.5 py-0.5 rounded-sm text-[10px] border" title="${c}" style="background-color: ${color}15; color: ${color}; border-color: ${color}40">${c}</span>`;
-                }).join('')}
+                        const color = getColorForTag(c);
+                        return `<span class="px-1.5 py-0.5 rounded-sm text-[10px] border" title="${c}" style="background-color: ${color}15; color: ${color}; border-color: ${color}40">${c}</span>`;
+                    }).join('')}
                         </div>
                     </td>
                     <td class="p-3 text-center font-mono text-slate-300 align-middle w-32">${s.Price}</td>
@@ -644,31 +646,31 @@
                     <td class="p-3 text-center font-mono text-slate-400 align-middle w-32">${volStr}</td>
                     <td class="p-3 text-center font-mono text-slate-400 align-middle w-32">${s['Turnover_Rate(%)'] ? s['Turnover_Rate(%)'].toFixed(2) + '%' : '-'}</td>
                 `;
-                fragment.appendChild(tr);
+                    fragment.appendChild(tr);
+                });
+
+                tbody.appendChild(fragment);
+                renderOffset += chunk.length;
+            }
+
+            function getColorForTag(tag) {
+                if (globalThemeColors[tag]) {
+                    return globalThemeColors[tag];
+                }
+                let hash = 0;
+                for (let i = 0; i < tag.length; i++) {
+                    hash = tag.charCodeAt(i) + ((hash << 5) - hash);
+                }
+                const index = Math.abs(hash) % CHART_PALETTE.length;
+                return CHART_PALETTE[index];
+            }
+
+            document.querySelector('.flex-1.overflow-auto').addEventListener('scroll', function (e) {
+                const { scrollTop, scrollHeight, clientHeight } = e.target;
+                if (scrollTop + clientHeight >= scrollHeight - 100) {
+                    renderChunk();
+                }
             });
-
-            tbody.appendChild(fragment);
-            renderOffset += chunk.length;
-        }
-
-        function getColorForTag(tag) {
-            if (globalThemeColors[tag]) {
-                return globalThemeColors[tag];
-            }
-            let hash = 0;
-            for (let i = 0; i < tag.length; i++) {
-                hash = tag.charCodeAt(i) + ((hash << 5) - hash);
-            }
-            const index = Math.abs(hash) % CHART_PALETTE.length;
-            return CHART_PALETTE[index];
-        }
-
-        document.querySelector('.flex-1.overflow-auto').addEventListener('scroll', function (e) {
-            const { scrollTop, scrollHeight, clientHeight } = e.target;
-            if (scrollTop + clientHeight >= scrollHeight - 100) {
-                renderChunk();
-            }
-        });
     </script>
     <div id="custom-tooltip"
         class="fixed hidden z-50 p-3 text-sm rounded pointer-events-none bg-[#050505]/95 border border-[#333] shadow-[0_0_10px_rgba(0,0,0,0.5)] text-slate-50 backdrop-blur-sm transition-opacity duration-75">
