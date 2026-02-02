@@ -376,7 +376,6 @@
 
             const isMobile = window.innerWidth < 768;
 
-            // On mobile, show top 8 (indices 0-7). On desktop, show all (indices 0-14).
             const endValue = isMobile ? 7 : 14;
 
             const option = {
@@ -400,8 +399,7 @@
                     borderColor: '#475569',
                     textStyle: { color: '#f8fafc' }
                 },
-                // Add bottom padding on mobile for the slider
-                grid: { top: 30, right: 10, bottom: isMobile ? 40 : 20, left: 10, containLabel: true },
+                grid: { top: 30, right: 10, bottom: 20, left: 10, containLabel: true },
                 xAxis: {
                     type: 'category',
                     data: categories,
@@ -421,22 +419,16 @@
                         xAxisIndex: 0,
                         startValue: 0,
                         endValue: endValue,
-                        zoomLock: true // Lock zooming to keep bar size consistent, only allow panning
+                        zoomLock: true
                     },
                     {
-                        show: isMobile,
+                        show: false,
                         type: 'slider',
                         xAxisIndex: 0,
                         bottom: 5,
                         height: 15,
                         startValue: 0,
-                        endValue: endValue,
-                        borderColor: 'transparent',
-                        backgroundColor: '#1e293b',
-                        fillerColor: 'rgba(56, 189, 248, 0.2)',
-                        handleStyle: { color: '#38bdf8' },
-                        moveHandleStyle: { color: '#38bdf8' },
-                        textStyle: { color: 'transparent' } // Hide text on slider
+                        endValue: endValue
                     }
                 ],
                 series: [{
