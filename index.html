@@ -140,42 +140,42 @@
                         <thead class="bg-slate-950/80 sticky top-0 backdrop-blur-md z-10">
                             <tr>
                                 <th
-                                    class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center w-20">
+                                    class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center w-32">
                                     代號</th>
                                 <th
-                                    class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center w-48">
+                                    class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center w-32">
                                     名稱 / 業務</th>
                                 <th
-                                    class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center w-32">
+                                    class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center w-64">
                                     產業細項</th>
                                 <th
-                                    class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center w-32">
+                                    class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center w-64">
                                     概念 / 題材</th>
-                                <th class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center cursor-pointer hover:text-white select-none group"
+                                <th class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center cursor-pointer hover:text-white select-none group w-32"
                                     onclick="sortTable('price')">
                                     成交價 <span id="sort-icon-price" class="text-[10px] ml-1 opacity-50">⇅</span>
                                 </th>
-                                <th class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center cursor-pointer hover:text-white select-none group"
+                                <th class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center cursor-pointer hover:text-white select-none group w-32"
                                     onclick="sortTable('mkt_cap')">
                                     市值(億) <span id="sort-icon-mkt_cap" class="text-[10px] ml-1 opacity-50">⇅</span>
                                 </th>
-                                <th class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center cursor-pointer hover:text-white select-none group"
+                                <th class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center cursor-pointer hover:text-white select-none group w-32"
                                     onclick="sortTable('change')">
                                     漲跌幅(%) <span id="sort-icon-change" class="text-[10px] ml-1 opacity-50">⇅</span>
                                 </th>
-                                <th class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center cursor-pointer hover:text-white select-none group"
+                                <th class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center cursor-pointer hover:text-white select-none group w-32"
                                     onclick="sortTable('amp')">
                                     振幅(%) <span id="sort-icon-amp" class="text-[10px] ml-1 opacity-50">⇅</span>
                                 </th>
-                                <th class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center cursor-pointer hover:text-white select-none group"
+                                <th class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center cursor-pointer hover:text-white select-none group w-32"
                                     onclick="sortTable('turnover')">
                                     成交額(百萬) <span id="sort-icon-turnover" class="text-[10px] ml-1 opacity-50">⇅</span>
                                 </th>
-                                <th class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center cursor-pointer hover:text-white select-none group"
+                                <th class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center cursor-pointer hover:text-white select-none group w-32"
                                     onclick="sortTable('vol')">
                                     成交數(張) <span id="sort-icon-vol" class="text-[10px] ml-1 opacity-50">⇅</span>
                                 </th>
-                                <th class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center cursor-pointer hover:text-white select-none group"
+                                <th class="p-3 text-xs font-medium text-slate-400 uppercase tracking-wider text-center cursor-pointer hover:text-white select-none group w-32"
                                     onclick="sortTable('rate')">
                                     成交周轉率(%) <span id="sort-icon-rate" class="text-[10px] ml-1 opacity-50">⇅</span>
                                 </th>
@@ -559,29 +559,29 @@
                 const volStr = s.Volume ? s.Volume : '-';
 
                 tr.innerHTML = `
-                    <td class="p-3 text-slate-300 font-mono align-middle text-center w-20">${s.Code}</td>
-                    <td class="p-3 align-middle text-center w-48">
+                    <td class="p-3 text-slate-300 font-mono align-middle text-center w-32">${s.Code}</td>
+                    <td class="p-3 align-middle text-center w-32">
                         <div class="font-medium text-white text-sm">${s.Name}</div>
                         ${businessInfo}
                     </td>
-                    <td class="p-3 align-middle text-center w-32">
-                        <div class="flex flex-wrap gap-1 justify-center max-w-[200px] mx-auto">${themeTags}</div>
+                    <td class="p-3 align-middle text-center w-64">
+                        <div class="flex flex-wrap gap-1 justify-center max-w-[240px] mx-auto">${themeTags}</div>
                     </td>
-                    <td class="p-3 align-middle text-center w-32">
-                        <div class="flex flex-wrap gap-1 justify-center max-w-[200px] mx-auto">
+                    <td class="p-3 align-middle text-center w-64">
+                        <div class="flex flex-wrap gap-1 justify-center max-w-[240px] mx-auto">
                             ${(s.concepts || []).map(c =>
                     `<span class="px-1.5 py-0.5 rounded-sm bg-indigo-900/50 text-[10px] text-indigo-200 border border-indigo-700/50" title="${c}">${c}</span>`
                 ).join('')}
                         </div>
                     </td>
-                    <td class="p-3 text-center font-mono text-slate-300 align-middle">${s.Price}</td>
-                    <td class="p-3 text-center font-mono text-slate-400 align-middle">${mktCapVal}</td> 
+                    <td class="p-3 text-center font-mono text-slate-300 align-middle w-32">${s.Price}</td>
+                    <td class="p-3 text-center font-mono text-slate-400 align-middle w-32">${mktCapVal}</td> 
 
-                    <td class="p-3 text-center font-mono font-bold ${changeColor} align-middle">${s['Change(%)'] > 0 ? '+' : ''}${s['Change(%)'].toFixed(2)}%</td>
-                    <td class="p-3 text-center font-mono text-slate-400 align-middle">${s.Amplitude ? s.Amplitude.toFixed(2) + '%' : '-'}</td>
-                    <td class="p-3 text-center font-mono text-slate-300 align-middle">${s['Turnover(M)']}</td>
-                    <td class="p-3 text-center font-mono text-slate-400 align-middle">${volStr}</td>
-                    <td class="p-3 text-center font-mono text-slate-400 align-middle">${s['Turnover_Rate(%)'] ? s['Turnover_Rate(%)'].toFixed(2) + '%' : '-'}</td>
+                    <td class="p-3 text-center font-mono font-bold ${changeColor} align-middle w-32">${s['Change(%)'] > 0 ? '+' : ''}${s['Change(%)'].toFixed(2)}%</td>
+                    <td class="p-3 text-center font-mono text-slate-400 align-middle w-32">${s.Amplitude ? s.Amplitude.toFixed(2) + '%' : '-'}</td>
+                    <td class="p-3 text-center font-mono text-slate-300 align-middle w-32">${s['Turnover(M)']}</td>
+                    <td class="p-3 text-center font-mono text-slate-400 align-middle w-32">${volStr}</td>
+                    <td class="p-3 text-center font-mono text-slate-400 align-middle w-32">${s['Turnover_Rate(%)'] ? s['Turnover_Rate(%)'].toFixed(2) + '%' : '-'}</td>
                 `;
                 fragment.appendChild(tr);
             });
