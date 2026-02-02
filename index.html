@@ -422,7 +422,8 @@
                     borderColor: '#333',
                     borderWidth: 1,
                     textStyle: { color: '#f8fafc' },
-                    extraCssText: 'box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);'
+                    extraCssText: 'box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);',
+                    confine: true
                 },
                 grid: { top: 30, right: 10, bottom: 20, left: 10, containLabel: true },
                 xAxis: {
@@ -552,8 +553,24 @@
             const tooltipEl = document.getElementById('custom-tooltip');
             if (!tooltipEl) return;
 
-            const x = e.clientX + 15;
-            const y = e.clientY + 15;
+            const gap = 15;
+            let x = e.clientX + gap;
+            let y = e.clientY + gap;
+
+            // Boundary check
+            const rect = tooltipEl.getBoundingClientRect();
+            const winWidth = window.innerWidth;
+            const winHeight = window.innerHeight;
+
+            // If goes off right edge, move to left of cursor
+            if (x + rect.width > winWidth) {
+                x = e.clientX - rect.width - gap;
+            }
+
+            // If goes off bottom edge, move above cursor
+            if (y + rect.height > winHeight) {
+                y = e.clientY - rect.height - gap;
+            }
 
             tooltipEl.style.left = x + 'px';
             tooltipEl.style.top = y + 'px';
