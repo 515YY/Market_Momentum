@@ -246,7 +246,7 @@
             const data = topThemes.map((t, index) => ({
                 value: t.market_cap_flow,
                 name: t.name,
-                themeData: t, // Pass full data for tooltip
+                themeData: t,
                 itemStyle: {
                     color: CHART_PALETTE[index % CHART_PALETTE.length]
                 }
@@ -507,8 +507,13 @@
 
             top.forEach((t, index) => {
                 const el = document.createElement('div');
-                el.className = "flex items-center justify-between p-2 hover:bg-white/5 rounded cursor-pointer transition-colors group";
+                el.className = "flex items-center justify-between p-2 hover:bg-white/5 rounded cursor-pointer transition-colors group relative";
                 el.onclick = () => filterTableByTheme(t.name);
+
+                // Tooltip events
+                el.addEventListener('mouseenter', () => showTooltip(t));
+                el.addEventListener('mousemove', (e) => moveTooltip(e));
+                el.addEventListener('mouseleave', () => hideTooltip());
 
                 const badgeColor = CHART_PALETTE[index % CHART_PALETTE.length];
                 const changeColor = t.avg_change > 0 ? 'text-rose-400' : 'text-emerald-400';
@@ -525,6 +530,37 @@
                 `;
                 container.appendChild(el);
             });
+        }
+
+        // Custom Tooltip Logic
+        const tooltipEl = document.getElementById('custom-tooltip');
+
+        function showTooltip(t) {
+            tooltipEl.innerHTML = `
+                <div class="font-bold text-base mb-1">${t.name}</div>
+                <div class="text-xs text-gray-400">
+                    平均漲幅: <span class="${t.avg_change > 0 ? 'text-rose-400' : 'text-emerald-400'}">${t.avg_change.toFixed(2)}%</span><br/>
+                    上漲比例: ${(t.up_ratio * 100).toFixed(0)}%<br/>
+                    族群家數: ${t.count}<br/>
+                    總成交額: ${t.market_cap_flow}M
+                </div>
+            `;
+            tooltipEl.classList.remove('hidden');
+        }
+
+        function moveTooltip(e) {
+            // Keep tooltip near cursor but ensure it doesn't go off screen
+            const x = e.clientX + 15;
+            const y = e.clientY + 15;
+
+            // Basic boundary check (optional, but good for UX)
+            // For now, just follow cursor
+            tooltipEl.style.left = x + 'px';
+            tooltipEl.style.top = y + 'px';
+        }
+
+        function hideTooltip() {
+            tooltipEl.classList.add('hidden');
         }
 
         function filterTableByTheme(themeName) {
@@ -634,6 +670,9 @@
             }
         });
     </script>
+    <div id="custom-tooltip"
+        class="fixed hidden z-50 p-3 text-sm rounded pointer-events-none bg-[#050505]/95 border border-[#333] shadow-[0_0_10px_rgba(0,0,0,0.5)] text-slate-50 backdrop-blur-sm transition-opacity duration-75">
+    </div>
 </body>
 
 </html>
