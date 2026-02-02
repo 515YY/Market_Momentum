@@ -61,20 +61,20 @@
     </style>
 </head>
 
-<body class="h-screen flex flex-col overflow-hidden">
+<body class="min-h-screen flex flex-col bg-[#0f172a] overflow-x-hidden">
 
-    <main class="h-screen w-screen flex flex-col overflow-hidden p-6 relative">
+    <main class="min-h-screen w-full flex flex-col p-4 md:p-6 relative gap-4 md:gap-6">
 
-        <div class="h-[35%] flex gap-6 mb-6">
+        <div class="flex flex-col md:flex-row gap-4 md:gap-6 md:h-[35%] shrink-0">
 
-            <div class="flex-1 grid grid-cols-3 gap-6">
-                <!-- Bar Chart (Takes 2 columns) -->
+            <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                <!-- Bar Chart (Takes 2 columns on desktop) -->
                 <div
-                    class="col-span-2 bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-2xl relative overflow-hidden group">
+                    class="col-span-1 md:col-span-2 bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-2xl p-4 md:p-5 shadow-2xl relative overflow-hidden group h-64 md:h-auto">
                     <div
                         class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity">
                     </div>
-                    <h2 class="text-xl font-bold text-white mb-2 flex items-center">
+                    <h2 class="text-lg md:text-xl font-bold text-white mb-2 flex items-center">
                         <span
                             class="w-2 h-6 bg-gradient-to-b from-cyan-400 to-blue-500 rounded-full mr-3 shadow-[0_0_15px_rgba(56,189,248,0.5)]"></span>
                         熱點資金動能
@@ -84,11 +84,11 @@
 
                 <!-- Pie Chart (Takes 1 column) -->
                 <div
-                    class="col-span-1 bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-2xl relative overflow-hidden group">
+                    class="col-span-1 bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-2xl p-4 md:p-5 shadow-2xl relative overflow-hidden group h-64 md:h-auto">
                     <div
                         class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity">
                     </div>
-                    <h2 class="text-xl font-bold text-white mb-2 flex items-center">
+                    <h2 class="text-lg md:text-xl font-bold text-white mb-2 flex items-center">
                         <span
                             class="w-2 h-6 bg-gradient-to-b from-emerald-400 to-teal-500 rounded-full mr-3 shadow-[0_0_15px_rgba(52,211,153,0.5)]"></span>
                         資金分佈
@@ -98,7 +98,7 @@
             </div>
 
             <div
-                class="w-80 bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-2xl flex flex-col">
+                class="w-full md:w-80 bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-2xl p-4 md:p-5 shadow-2xl flex flex-col h-64 md:h-auto">
                 <div class="flex items-center justify-between mb-3">
                     <h2 class="text-lg font-bold text-white flex items-center">
                         <span
@@ -114,10 +114,11 @@
         </div>
 
         <div
-            class="flex-1 bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-2xl p-1 shadow-2xl flex flex-col overflow-hidden">
-            <div class="p-4 border-b border-white/5 flex items-center justify-between shrink-0">
+            class="flex-1 bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-2xl p-1 shadow-2xl flex flex-col overflow-hidden min-h-[500px] mb-6">
+            <div
+                class="p-4 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between shrink-0 gap-3">
                 <div class="flex items-center gap-4">
-                    <h2 class="text-xl font-bold text-white flex items-center cursor-pointer hover:opacity-80 transition-opacity"
+                    <h2 class="text-lg md:text-xl font-bold text-white flex items-center cursor-pointer hover:opacity-80 transition-opacity"
                         id="table-title" onclick="resetFilter()" title="Click to Reset">
                         <span class="text-gradient">全市場觀察</span>
                     </h2>
