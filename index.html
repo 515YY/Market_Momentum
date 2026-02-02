@@ -374,6 +374,11 @@
             const categories = verticalSorted.map(t => t.name);
             const values = verticalSorted.map(t => t.avg_change);
 
+            const isMobile = window.innerWidth < 768;
+
+            // On mobile, show top 8 (indices 0-7). On desktop, show all (indices 0-14).
+            const endValue = isMobile ? 7 : 14;
+
             const option = {
                 backgroundColor: 'transparent',
                 tooltip: {
@@ -395,7 +400,8 @@
                     borderColor: '#475569',
                     textStyle: { color: '#f8fafc' }
                 },
-                grid: { top: 30, right: 10, bottom: 20, left: 10, containLabel: true },
+                // Add bottom padding on mobile for the slider
+                grid: { top: 30, right: 10, bottom: isMobile ? 40 : 20, left: 10, containLabel: true },
                 xAxis: {
                     type: 'category',
                     data: categories,
@@ -409,7 +415,30 @@
                     splitLine: { show: true, lineStyle: { color: 'rgba(255,255,255,0.05)' } },
                     axisLabel: { color: '#94a3b8', formatter: '{value}%' }
                 },
-                dataZoom: [{ type: 'inside', start: 0, end: 100 }],
+                dataZoom: [
+                    {
+                        type: 'inside',
+                        xAxisIndex: 0,
+                        startValue: 0,
+                        endValue: endValue,
+                        zoomLock: true // Lock zooming to keep bar size consistent, only allow panning
+                    },
+                    {
+                        show: isMobile,
+                        type: 'slider',
+                        xAxisIndex: 0,
+                        bottom: 5,
+                        height: 15,
+                        startValue: 0,
+                        endValue: endValue,
+                        borderColor: 'transparent',
+                        backgroundColor: '#1e293b',
+                        fillerColor: 'rgba(56, 189, 248, 0.2)',
+                        handleStyle: { color: '#38bdf8' },
+                        moveHandleStyle: { color: '#38bdf8' },
+                        textStyle: { color: 'transparent' } // Hide text on slider
+                    }
+                ],
                 series: [{
                     type: 'bar',
                     data: values,
