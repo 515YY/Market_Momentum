@@ -5,7 +5,7 @@ import numpy as np
 import time
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-FILE_MARKET = os.path.join(BASE_DIR, 'StockList.csv')
+FILE_MARKET = os.path.join(BASE_DIR, 'C:/omg/StockList.csv')
 FILE_KNOWLEDGE_BASE = os.path.join(BASE_DIR, 'Stock_Knowledge_Base.json')
 FILE_DASHBOARD_JS = os.path.join(BASE_DIR, 'dashboard_data.js')
 
